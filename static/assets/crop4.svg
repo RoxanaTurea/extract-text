@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 23.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.1"
+   id="Icons"
+   x="0px"
+   y="0px"
+   viewBox="0 0 32 32"
+   style="enable-background:new 0 0 32 32;"
+   xml:space="preserve"
+   sodipodi:docname="crop4.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs1064" /><sodipodi:namedview
+   id="namedview1062"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   showgrid="false"
+   inkscape:zoom="26"
+   inkscape:cx="15.980769"
+   inkscape:cy="16.019231"
+   inkscape:window-width="1920"
+   inkscape:window-height="1017"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Icons" />
+<style
+   type="text/css"
+   id="style1049">
+	.st0{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+	.st2{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:6,6;}
+	.st3{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:4,4;}
+	.st4{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;}
+	.st5{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-dasharray:3.1081,3.1081;}
+	
+		.st6{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:4,3;}
+</style>
+<polyline
+   class="st0"
+   points="30,25 7,25 7,2 "
+   id="polyline1051"
+   style="stroke:#008cc8;stroke-opacity:1" />
+<polyline
+   class="st0"
+   points="7,7 25,7 25,25 "
+   id="polyline1053"
+   style="stroke:#008cc8;stroke-opacity:1" />
+<line
+   class="st0"
+   x1="7"
+   y1="7"
+   x2="2"
+   y2="7"
+   id="line1055"
+   style="stroke:#008cc8;stroke-opacity:1" />
+<line
+   class="st0"
+   x1="25"
+   y1="30"
+   x2="25"
+   y2="25"
+   id="line1057"
+   style="stroke:#008cc8;stroke-opacity:1" />
+<line
+   class="st0"
+   x1="7"
+   y1="25"
+   x2="29"
+   y2="3"
+   id="line1059"
+   style="fill:#46b2e1;fill-opacity:1;stroke:#008cc8;stroke-opacity:1" />
+</svg>
