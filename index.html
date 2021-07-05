@@ -1,0 +1,428 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+ 	<meta charset="utf-8">
+	<title>RSystems</title>
+ 	<meta name="description" content="R System Intelligent Process Automation DEMO">
+ 	<meta id="viewport" name="viewport" content="initial-scale=1.0,user-scalable=no">
+ 	<link rel="stylesheet" href="./static/css/main.css"> 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="./static/js/main.js"></script>
+</head>
+
+<body class="extract-page other-pages">
+	<div class="container">
+		<div class="sidebar-small sidebar">
+			<div class="logo-small"><a href="#"><img id="img" width="95px" height="56px" src="./static/assets/logoRS.png" alt="logo" /></a></div>
+			
+			<div class="copyright not-home-copyright"><span class="copyright-text">© R-Systems 2021. All rights reserved.</span></div>
+		</div>
+		<!--  end sidebar  -->
+
+		<div class="page-content page-content-other">
+			<div class="left-half">
+				<div class="site-title-tagline">
+					<!--<span class="demo-tag-small">DEMO</span>-->
+					<p class="site-title" id="site-title">Extract text from media</p>
+				</div>
+				<!--<a href="../index" class="return-home" id="retunr-home-link">DASHBOARD</a>	-->
+					
+				<span class="rh-title-label">Text extracted:</span>				
+
+				<div class="extract-text-area" id="textExtractCont" >						
+                </div>
+			</div>
+
+			<div class="right-half">
+				<form id="extract-form" method="POST" enctype="multipart/form-data">
+				<div class="card" id="extract-media-container" style="padding-top: 20px;">
+					<!--<div class="title-card">Extract text</div>-->		
+					<div class="video-container">
+						
+						<div class="video-title-cont">
+							<div class="icon-container"><span id="icon-media-sentiment-title-cont"></span></div>
+							<p class="mediaTitle" id="media-title"></p>
+						</div>
+						
+						<div id="upload-media-container">
+							<div id="initTextExtractCont" >			
+								<div class="icon-card"></div>
+							</div>
+						</div>
+						<div class="cont_upload-img" id="frames1"></div>
+
+						<div class="sentiment-container">						
+							<div id="positive-sentiment-cont" title="Positive sentiment"> 
+								<span class="s-satisfied"></span>
+								<h6>Positive</h6>
+								<h5 id="positive-sentiment"></h5>
+							</div>
+
+							<div id="neutral-sentiment-cont" title="Neutral sentiment">
+								<span class="s-neutral"></span>
+								<h6>Neutral</h6>
+								<h5 id="neutral-sentiment"></h5>
+							</div>
+
+							<div id="negative-sentiment-cont" title="Negative sentiment">
+								<span class="s-dissatisfied"></span>
+								<h6>Negative</h6>
+								<h5 id="negative-sentiment"></h5>
+							</div>
+						</div>
+					</div>	
+
+					<div class="video-container-form">
+
+						<div class="row">								
+							<div class="custom-file blue-button">
+								<input type="file" class="custom-file-input" id="uploadvideo" name="mediaFile" required>
+								<label class="custom-file-label blue-button" >Choose media file</label>
+								<div class="invalid-feedback"></div>
+							</div>
+							<div class="cont_upload-img" id="frames1"></div>
+						</div>
+						
+						<div id="">
+							<div class="row">       
+								<select id="language" class="typearea" name="language" >
+								<option value="en-GB">English</option>
+								<option value="fr-FR">French</option>
+								<option value="de-DE">German</option>
+								<option value="it-IT">Italian</option>
+								<option value="pl-PL">Polish</option>
+								<option value="ro-RO" selected>Romanian</option>
+								<option value="es-ES">Spanish</option>
+								</select>							
+							</div>
+							<div class="row"> 
+								<input type="checkbox" checked id="withSentimentAnalysis" value="true" name="withSentimentAnalysis">
+								<label for="withSentimentAnalysis" title="With sentiment analysis " id="withAnalysisLabel"> with sentiment analysis </label> 
+							</div>
+							<div class="row" style="margin-bottom: 0px;">  
+								<button type="submit" id="submit-extract" class="upload-label" >Extract</button>
+							</div>
+						</div>
+					</div>	
+				</div>
+			</form>
+			</div>			
+		</div>
+	</div>
+
+	<div id="loader">
+		<div class="spinner"></div>
+		<div class="mess"> Extract...</div>
+	</div>	
+
+   <script>
+
+	function startLoader() {
+		loader = document.querySelector('#loader');
+		loader.style.display = 'block';
+	}
+	
+	function stopLoader() {
+		loader = document.querySelector('#loader');
+		loader.style.display = 'none';
+	}	
+
+	function isVideoType (type) {
+		if (type === 'video/mp4' || type === 'video/webm' || type === 'video/ogg') {
+			return true;
+		}
+		return false;
+	}
+
+	function isAudioType (type) {
+		if (type === 'audio/mpeg' || type === 'audio/ogg' || type === 'audio/wav') {
+			return true;
+		}
+		return false;
+	}
+
+	function validateFile () {
+		if ($('#uploadvideo')[0].files.length === 1 && (isVideoType ($('#uploadvideo')[0].files[0].type) || isAudioType ($('#uploadvideo')[0].files[0].type))) {
+				return true;
+		} else {
+			$("#upload-media-container").html('');
+			$("#upload-media-container").append('<div class="empty-video">Choose a media file!</div>');
+			return false;
+		} 		 
+	}
+
+	$(document).ready(function(){
+
+		$('#uploadvideo').change(function(){
+			$("#upload-media-container").html('');
+            $("#textExtractCont").html('');
+			$("#media-title").html('');
+            $(".sentiment-container").hide();
+            $("#icon-media-sentiment-title-cont").hide();            
+			$(".upload-media-container").removeClass('withFile');
+			if (validateFile()) {
+				if (isVideoType ($('#uploadvideo')[0].files[0].type)) {
+					$("#upload-media-container").append('<video class="main-video" controls onplaying = "syncMediaWithTxt()"  id="media-extract" src="'+window.URL.createObjectURL(this.files[0])+'" type="'+ this.files[0].type +'">Your browser does not support the video tag.</video>');
+				} else {
+					$("#upload-media-container").append('<audio class="main-video" controls onplaying = "syncMediaWithTxt()"  id="media-extract" src="'+window.URL.createObjectURL(this.files[0])+'" type="'+ this.files[0].type +'">Your browser does not support the audio tag.</audio>');
+				}
+				$("#upload-media-container").addClass('withFile', 1000);
+				
+				$("#media-title").html(this.files[0].name);
+			}
+		});
+	});
+	
+
+	var initialMediaObj = document.querySelector('#media-extract');
+	var mediaTitleCont = document.querySelector('#media-title');
+	if (initialMediaObj && mediaTitleCont) {
+		var initialMediaName = initialMediaObj.src.substring(initialMediaObj.src.lastIndexOf('\/') + 1, initialMediaObj.src.length);
+		initialMediaName = initialMediaName.substring(0, initialMediaName.lastIndexOf('\.'));
+		initialMediaName = initialMediaName.replaceAll("%20", " ");
+		mediaTitleCont.textContent = initialMediaName;
+	}
+	var speakersExtrVal;
+
+
+	var form = document.querySelector("#extract-form");
+
+	form.addEventListener('submit', function(ev) {
+		ev.preventDefault();
+        $(".sentiment-container").hide();
+        $("#icon-media-sentiment-title-cont").hide();    
+		if (validateFile()) {
+			startLoader();
+			var oData = new FormData(form);
+            var withSentiment  = document.querySelector('#withSentimentAnalysis').checked;
+            (withSentiment || oData.append("withSentimentAnalysis", "false"));
+
+			var request = new XMLHttpRequest();
+			request.open("POST", "http://localhost:8080/api/v1/extractTextFromMedia", true);
+			request.onload = function(event) {
+				if (request.status == 200) {
+					console.log(request.responseText);
+					const Data = JSON.parse(request.responseText);
+					renderInfo(Data);
+				} else {
+					stopLoader();
+					console.log("Error " + request.status + " occurred when trying to upload your file.");
+				}
+			}
+			request.send(oData);
+		}
+	}, false);
+ 
+   	function renderInfo(data){
+		var mediaName, overallSentiment, pozitiveSentiment, neutralSentiment, negativeSentiment, speakerContainer, 
+		speakerTxtCont, btnPlay, periodCont, speakerTxt, sentimentCont, sentimentIcon, divContExtTxt, fragment;
+
+		speakersExtrVal = data.textWithTimes;
+		
+		stopLoader();
+
+		mediaName = document.querySelector('#media-title');
+		//mediaName.textContent = data.mediaFileName;
+
+		if (data.overallSentiment && (data.positiveSentimentPercent || data.neutralSentimentPercent || data.negativeSentimentPercent )) {
+			overallSentiment= document.querySelector('#icon-media-sentiment-title-cont');
+			overallSentiment.style.display = "block";
+			if (data.overallSentiment === "positive") {
+				overallSentiment.className = "s-satisfied";
+				overallSentiment.title = "Positive sentiment";
+			} else if (data.overallSentiment === "neutral") {
+				overallSentiment.className = "s-neutral";
+				overallSentiment.title = "Neutral sentiment";
+			} else {
+				overallSentiment.className = "s-dissatisfied";
+				overallSentiment.title = "Negative sentiment";
+			}
+		}
+
+		if ((data.positiveSentimentPercent && !isNaN(data.positiveSentimentPercent)) || (data.neutralSentimentPercent && !isNaN(data.neutralSentimentPercent)) 
+			|| (data.negativeSentimentPercent && !isNaN(data.negativeSentimentPercent))) {
+			var containerSentiment =  document.querySelector('.sentiment-container');
+			containerSentiment.style.display = "block";
+			pozitiveSentiment = document.querySelector('#positive-sentiment');
+			pozitiveSentiment.textContent = data.positiveSentimentPercent.toFixed(2) + "%";
+
+			neutralSentiment = document.querySelector('#neutral-sentiment');
+			neutralSentiment.textContent = data.neutralSentimentPercent.toFixed(2) + "%";
+
+			negativeSentiment = document.querySelector('#negative-sentiment');
+			negativeSentiment.textContent = data.negativeSentimentPercent.toFixed(2) + "%";
+		}
+
+		divContExtTxt = document.querySelector('#textExtractCont');
+		divContExtTxt.innerHTML = '';
+		fragment = document.createDocumentFragment();
+		
+	   	for (var i = 0; i < speakersExtrVal.length; i++) {
+			
+		   console.log(speakersExtrVal[i].fromSecond)
+		   console.log(speakersExtrVal[i].toSecond)
+		   console.log(speakersExtrVal[i].text)		
+		
+			speakerContainer = document.createElement('div');
+			speakerContainer.className = "extract-text-container";
+			speakerContainer.id = "extrTxtCont" + i;
+
+			speakerTxtCont = document.createElement('div');
+			speakerTxtCont.className = "text-container";
+
+			periodCont = document.createElement('h6');
+			periodCont.textContent = speakersExtrVal[i].period;
+
+			speakerTxt = document.createElement('p');
+			speakerTxt.textContent = speakersExtrVal[i].text;
+
+			btnPlay = document.createElement('div');
+		//	btnPlay.setAttribute("fromSecond", speakersExtrVal[i].fromSecond);
+		//	btnPlay.setAttribute("toSecond", speakersExtrVal[i].toSecond);
+			btnPlay.setAttribute("index", i);
+			btnPlay.className = "btnTxtPlay";
+			speakerTxt.appendChild(btnPlay);
+			btnPlay.onclick = function() {playMediaFrom(this)};
+			
+			if (speakersExtrVal[i].textSentiment) {
+
+				sentimentCont = document.createElement('div');
+				sentimentCont.className = "icon-container";
+
+				sentimentIcon = document.createElement('span');
+				sentimentIcon.setAttribute("index", i);
+				sentimentIcon.onmouseenter = function() {showSentimentPopup(this)};
+				sentimentIcon.onmouseleave = function() {hideSentimentPopup(this)};
+				
+				if (speakersExtrVal[i].textSentiment === "positive") {
+					sentimentIcon.className = "s-satisfied";
+				//	sentimentIcon.title = "Positive sentiment";
+				} else if (speakersExtrVal[i].textSentiment === "neutral") {
+					sentimentIcon.className = "s-neutral";
+				//	sentimentIcon.title = "Neutral sentiment";
+				} else {
+					sentimentIcon.className = "s-dissatisfied";
+				//	sentimentIcon.title = "Negative sentiment";
+				}
+
+				sentimentCont.appendChild(sentimentIcon);
+				speakerContainer.appendChild(sentimentCont);
+			}
+
+			speakerTxtCont.appendChild(periodCont);
+			speakerTxtCont.appendChild(speakerTxt);
+			speakerContainer.appendChild(speakerTxtCont);
+			fragment.appendChild(speakerContainer);
+
+		   console.log("/*-----------------------------------------*/")
+	   }
+
+	   divContExtTxt.appendChild(fragment);
+
+   	}
+
+   	function playMediaFrom(txtExtrObj) {
+		var mediaContent = document.querySelector("#media-extract");
+		var index = txtExtrObj.attributes.index.value;
+		if ( mediaContent && index >= 0 && speakersExtrVal[index] && parseInt(speakersExtrVal[index].fromSecond) >= 0 && 
+			parseInt(speakersExtrVal[index].fromSecond) <= parseInt(speakersExtrVal[index].toSecond) ) {
+
+			mediaContent.currentTime =  parseInt(speakersExtrVal[index].fromSecond);
+			mediaContent.play();
+		}
+   	}
+
+   	function syncMediaWithTxt (event) {
+		var mediaContent = document.querySelector("#media-extract"); 
+				
+		if ( speakersExtrVal && speakersExtrVal.length ) {
+			for (var i = 0; i < speakersExtrVal.length; i++) {
+				var txtContainer = document.querySelector("#extrTxtCont" + i);
+				
+				if (txtContainer) {
+					txtContainer.classList.remove("inTimeCont");
+
+					if ( (speakersExtrVal[i].fromSecond <= mediaContent.currentTime) && (speakersExtrVal[i].toSecond > mediaContent.currentTime) ) {
+						txtContainer.classList.add("inTimeCont");
+					}
+				}
+			}	
+		}
+		
+		if ( !mediaContent.paused ) {
+			setTimeout(syncMediaWithTxt, 1000);
+		}
+   	}
+
+	function showSentimentPopup(objIconSentim) {
+		if ( !objIconSentim.firstChild ) {
+
+			var index = objIconSentim.attributes.index.value;
+			
+			if (index >= 0 && speakersExtrVal[index] && speakersExtrVal[index].sentimentConfidenceScores ) {
+
+				var objSentimScorePopup = document.createElement('div');
+				objSentimScorePopup.className = 'general-sentiment-container-popup';
+				var sentimContainer = document.createElement('div');
+				sentimContainer.className = 'sentiment-container general-sentiment-container';
+
+				var sentimContainerPositive = document.createElement('div');				
+				var sentimContainerNeutral = document.createElement('div');				
+				var sentimContainerNegative = document.createElement('div');
+				
+
+				var iconPositive = document.createElement('span');
+				iconPositive.className = 's-satisfied';
+				var titlePositive = document.createElement('h6');
+				titlePositive.textContent = 'Positive';
+				var valuePositive = document.createElement('h5');
+				valuePositive.textContent = speakersExtrVal[index].sentimentConfidenceScores.positive;
+
+				var iconNeutral = document.createElement('span');
+				iconNeutral.className = 's-neutral';
+				var titleNeutral = document.createElement('h6');
+				titleNeutral.textContent = 'Neutral';
+				var valueNeutral = document.createElement('h5');
+				valueNeutral.textContent = speakersExtrVal[index].sentimentConfidenceScores.neutral;
+
+				var iconNegative = document.createElement('span');
+				iconNegative.className = 's-dissatisfied';	
+				var titleNegative = document.createElement('h6');
+				titleNegative.textContent = 'Negative';
+				var valueNegative = document.createElement('h5');
+				valueNegative.textContent = speakersExtrVal[index].sentimentConfidenceScores.negative;
+				
+				sentimContainerPositive.appendChild(iconPositive);
+				sentimContainerPositive.appendChild(titlePositive);
+				sentimContainerPositive.appendChild(valuePositive);
+
+				sentimContainerNeutral.appendChild(iconNeutral);
+				sentimContainerNeutral.appendChild(titleNeutral);
+				sentimContainerNeutral.appendChild(valueNeutral);
+
+				sentimContainerNegative.appendChild(iconNegative);
+				sentimContainerNegative.appendChild(titleNegative);
+				sentimContainerNegative.appendChild(valueNegative);
+
+				sentimContainer.appendChild(sentimContainerPositive);
+				sentimContainer.appendChild(sentimContainerNeutral);
+				sentimContainer.appendChild(sentimContainerNegative);
+
+				objSentimScorePopup.appendChild(sentimContainer);
+				objIconSentim.appendChild(objSentimScorePopup);
+			}
+		} else {
+			objIconSentim.firstChild.style.display = 'block';
+		}
+	}
+
+	function hideSentimentPopup (objIconSentim) {
+		if ( objIconSentim.firstChild ) {
+			objIconSentim.firstChild.style.display = 'none';
+		}
+	}
+
+    </script>
+</body>
+</html>
